@@ -18,10 +18,13 @@ $ pip install BeautifulSoup4
 $ pip install sqlite3
 ```
 
-To run simply call  carDBSetup to initialize the DB then call scrape.py
+##Instructions
+To run simply call carDBSetup.py to initialize the DB then call scrape.py
 
 ```sh
 $ python3 carDBSetup.py
 $ python3 scrape.py
 ```
 The database will come out as car_base.db
+Warning - This is a very lengthy process.
+For my personal build it took over 12 hours to complete

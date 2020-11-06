@@ -29,7 +29,7 @@ def getMakeByYear(year):
 	#fetch span class 'name' for Make names
 	results = soup.find_all('span', class_='name')
 
-	#Print list of names
+	#Use list of Makes to get Models
 	for result in results:
 		make = (str(result)[24:-7])
 		#For passing url replace " " with -
@@ -57,10 +57,13 @@ def getModelByMakeAndYear(mke,yer,yearU):
 	#fetch h3 class 'title' for all Models
 	results = soup.find_all('h3', class_='title')
 
-	#Print list of Models
+	#Use list of Models to get Trim
 	for result in results:
 		model = (str(result)[19+len(make):-5])
 		print(model)
+		#Single exception for Hd model that breaks pattern
+		if year == 2020 and make == "Harley-Davidson" and model[:4] == "FXBB":
+			model = "FXBB-FXBB" 
 		#For passing url replace "/" with ""
 		tempModel = copy.copy(model)
 		tempModel = tempModel.replace("/", "")
@@ -68,6 +71,8 @@ def getModelByMakeAndYear(mke,yer,yearU):
 		tempModel = tempModel.replace(" &amp; ", " ")
 		#For passing replace " " with -
 		tempModel = tempModel.replace(" ", "-")
+		#For edge case
+		tempModel = tempModel.replace("---", "-")
 		#For passing replace " " with -
 		model = model.replace(" ", "-")
 		#Set Trim Url
@@ -99,6 +104,7 @@ def getTrimByModelMakeYear(mdel,mke,trimU):
 	#Strip html tags and convert to int
 	num_trim = (int(str(amount)[4:-5]))
 
+	#If there's only one trim, fetch info on page
 	if num_trim > 1:
 		#fetch h3 class 'title' for all Trims
 		results = soup.find_all('h3', class_='title')
@@ -113,6 +119,27 @@ def getTrimByModelMakeYear(mdel,mke,trimU):
 			trim = trim.replace(" &amp; ", " ")
 			#For passing replace " " with -
 			trim = trim.replace(" ", "-")
+			#For edge case of " - "
+			trim = trim.replace("---", "-")
+			#For edge case of non-ASCII characters
+			encode_trim = trim.encode("ascii", "ignore")
+			trim = encode_trim.decode()
+			#For edge case of trim ending in space
+			if trim.endswith("-"):
+				trim = trim[:-1]
+			#For edge case of trim ending in "
+			if trim.endswith('"'):
+				trim = trim[:-1]
+			#For edge case of double -- after removale of ascii
+			trim = trim.replace("--","-")
+			#For edge case of starting with a "+"
+			if trim.startswith('+'):
+				trim = trim[2:]
+			#For edge case of starting with a "+"
+			if trim.startswith('!'):
+				trim = trim[2:]
+			#For edge case of trim containing " ' "
+			trim = trim.replace("'","")
 			#For passing url replace "/" with ""
 			trim = trim.replace("/", "")
 			#Set info URL
